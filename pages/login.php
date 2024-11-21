@@ -16,16 +16,27 @@ if (isset($_POST['submit'])) {
 
         // Kullanıcı bulunduysa ve şifre doğruysa
         if ($user && password_verify($password, $user['sifre'])) {
-            session_regenerate_id(true);
+            session_regenerate_id(true); // Yeni session id oluştur
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['isim'];
             $_SESSION['user_role'] = $user['rol'];
-            header("Location: dashboard.php");
-            exit;
+
+            // Rolüne göre yönlendirme
+            if ($user['rol'] == 'admin') {
+                header("Location: admin-dashboard.php"); // Admin paneline yönlendir
+                exit;
+            } elseif ($user['rol'] == 'satıcı') {
+                header("Location: seller-dashboard.php"); // Satıcı paneline yönlendir
+                exit;
+            } else {
+                header("Location: index.php"); // Kullanıcı ana sayfaya yönlendir
+                exit;
+            }
         } else {
             $error_message = "E-posta veya şifre yanlış!";
         }
     } catch (PDOException $e) {
+        // Veritabanı hatası durumunda mesaj göster
         $error_message = "Bir hata oluştu. Lütfen tekrar deneyin.";
     }
 }
